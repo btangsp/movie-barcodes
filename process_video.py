@@ -21,16 +21,17 @@ print "Timestamp for first frame: "+hh+mm+ss+ff
 filename = str(sys.argv[1])
 width = int(sys.argv[2])
 height = int(sys.argv[3])
+nthFrame = int(sys.argv[4])
 # output image file (same as input file, with non-alphanums stripped):
 outfilename = re.sub(r'\W+', '', filename) + ".png"
 print "Filename:", filename
-print "Dimensions:",width,height
+print "Dimensions:", width, height
 
 ###
 ### This section: credit to http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
 
 # Open the video file. In Windows you might need to use FFMPEG_BIN="ffmpeg.exe"; Linux/OSX should be OK.
-FFMPEG_BIN = "ffmpeg"
+FFMPEG_BIN = r"C:\Users\Nick\Documents\Programming\movie-barcodes\ffmpeg-20170520-64ea4d1-win64-static\bin\ffmpeg.exe"
 command = [ FFMPEG_BIN,
             '-threads', '4',
             '-ss', hh+mm+ss,
@@ -52,15 +53,16 @@ def draw_next_frame_rgb_avg(raw_frame):
 rgb_list = []
 x = 1 # optional; purely for displaying how many frames were processed
 while pipe.stdout.read(width*height*3): # as long as there's data in the pipe, keep reading frames
-    try:
-        rgb_list.append(draw_next_frame_rgb_avg(pipe.stdout.read(width*height*3)))
-        x = x + 1
-    except:
-        print "No more frames to process (or error occurred). Number of frames processed:", x
+    x = x + 1
+    if x % nthFrame == 0:
+        try:
+            rgb_list.append(draw_next_frame_rgb_avg(pipe.stdout.read(width*height*3)))
+        except:
+            print "No more frames to process (or error occurred). Number of frames processed:", x
 
 # create a new image width the same width as number of frames sampled,
 # and draw one vertical line per frame at x=frame number
-image_height = 720 # set image height to whatever you want; you could use int(len(rgb_list)*9/16) to make a 16:9 image for instance
+image_height = 2160 # set image height to whatever you want; you could use int(len(rgb_list)*9/16) to make a 16:9 image for instance
 new = Image.new('RGB',(len(rgb_list),image_height))
 draw = ImageDraw.Draw(new)
 # x = the location on the x axis of the next line to draw
@@ -73,3 +75,4 @@ new.save(outfilename, "PNG")
 
 print start_time
 print "Script finished at " + time.strftime("%H:%M:%S")
+print "Frames" + str(len(rgb_list))
