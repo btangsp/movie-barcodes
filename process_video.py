@@ -21,7 +21,7 @@ print "Timestamp for first frame: "+hh+mm+ss+ff
 filename = str(sys.argv[1])
 width = int(sys.argv[2])
 height = int(sys.argv[3])
-nthFrame = int(sys.argv[4])
+nthFrame = int(sys.argv[4]) #(fps * total runtime(s)) / 4096
 # output image file (same as input file, with non-alphanums stripped):
 outfilename = re.sub(r'\W+', '', filename) + ".png"
 print "Filename:", filename
@@ -31,7 +31,7 @@ print "Dimensions:", width, height
 ### This section: credit to http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
 
 # Open the video file. In Windows you might need to use FFMPEG_BIN="ffmpeg.exe"; Linux/OSX should be OK.
-FFMPEG_BIN = r"C:\Users\Nick\Documents\Programming\movie-barcodes\ffmpeg-20170520-64ea4d1-win64-static\bin\ffmpeg.exe"
+FFMPEG_BIN = "ffmpeg" #if ffmpeg was manually installed, need to include path
 command = [ FFMPEG_BIN,
             '-threads', '4',
             '-ss', hh+mm+ss,
