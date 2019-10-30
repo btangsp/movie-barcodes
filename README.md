@@ -1,10 +1,10 @@
 # Movie Barcode Generator
 ![github-bighero6](https://cloud.githubusercontent.com/assets/1192790/11238640/1f7ea5ac-8e3b-11e5-8c2b-e00758b1ec19.png)
 
+Turn video files into 'barcodes' where vertical lines represent the average colour of individual frames. [Example album.](http://imgur.com/gallery/Pw6LD/) Uses code [published by zulko](http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/).
+
 **UPDATES:**
 * 2019 Oct 29: removed the requirement to input video dimensions and nthFrame, based off of [NapsterInBlue](https://github.com/NapsterInBlue/movie-barcodes)'s addition
-
-Turn video files into 'barcodes' where vertical lines represent the average colour of individual frames. [Example album.](http://imgur.com/gallery/Pw6LD/) Uses code [published by zulko](http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/).
 
 **Requirements:**
 * [ffmpeg](https://www.ffmpeg.org/)
