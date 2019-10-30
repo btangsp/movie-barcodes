@@ -35,7 +35,6 @@ And then to repeat the process for all frames:
 This should work with any movie file ffmpeg can handle (though in practice I've only tested it with mp4 files). 
 
 **Quibbles:**
-* There ~~may be~~ is almost certainly a faster approach than the one I'm using. Perhaps I should only take every nth frame?
 * Users should be able to specify an output size instead of having to manually edit the file.
 
 (Video stills: [Big Buck Bunny](https://peach.blender.org/download/))
