@@ -5,6 +5,10 @@ from PIL import Image, ImageDraw
 import re
 import time
 import sys
+import math
+
+# Open the video file. In Windows you might need to use FFMPEG_BIN="ffmpeg.exe"; FFMPEG_BIN = "ffmpeg" # on Linux ans Mac OS
+FFMPEG_BIN = "ffmpeg" #if ffmpeg was manually installed, need to include path
 
 # Timestamp so you can see how long it took
 start_time = "Script started at " + time.strftime("%H:%M:%S")
@@ -19,9 +23,37 @@ print "Timestamp for first frame: "+hh+mm+ss+ff
 
 # input file (first argument)
 filename = str(sys.argv[1])
-width = int(sys.argv[2])
-height = int(sys.argv[3])
-nthFrame = int(sys.argv[4]) #(fps * total runtime(s)) / 4096
+
+#parsing out dimensions from video file
+command = ['ffprobe', '-v', 'error',
+           '-select_streams', 'v:0',
+           '-show_entries', 'stream=width,height',
+           '-of', 'default=nw=1:nk=1', filename]
+dimension = sp.check_output(command)
+dimension = [int(i) for i in dimension.splitlines()]
+width = dimension[0]
+height = dimension[1]
+
+#parsing out framerate from video file
+command = ['ffprobe', '-v', 'error', 
+           '-select_streams', 'v', '-of', 
+           'default=noprint_wrappers=1:nokey=1', 
+           '-show_entries', 'stream=r_frame_rate', filename]
+fr = sp.check_output(command)
+fr = [int(i) for i in fr. split('/')]
+fr = fr[0]/fr[1]
+
+# parsing out runtime from video file
+command = ['ffprobe', '-v', 'error', 
+           '-show_entries', 'format=duration', 
+           '-of', 'default=noprint_wrappers=1:nokey=1', filename]
+runtime = sp.check_output(command)
+runtime = float(runtime)
+
+nthFrame = math.floor(fr * runtime / 4096) #(fps * total runtime(s)) / 4096
+if nthFrame < 1: # if the runtime is too short, the frame sampling will be set at 1
+    nthFrame = 1
+    
 # output image file (same as input file, with non-alphanums stripped):
 outfilename = re.sub(r'\W+', '', filename) + ".png"
 print "Filename:", filename
@@ -30,8 +62,6 @@ print "Dimensions:", width, height
 ###
 ### This section: credit to http://zulko.github.io/blog/2013/09/27/read-and-write-video-frames-in-python-using-ffmpeg/
 
-# Open the video file. In Windows you might need to use FFMPEG_BIN="ffmpeg.exe"; Linux/OSX should be OK.
-FFMPEG_BIN = "ffmpeg" #if ffmpeg was manually installed, need to include path
 command = [ FFMPEG_BIN,
             '-threads', '4',
             '-ss', hh+mm+ss,
@@ -39,7 +69,7 @@ command = [ FFMPEG_BIN,
             '-f', 'image2pipe',
             '-pix_fmt', 'rgb24',
             '-vcodec', 'rawvideo', '-']
-pipe = sp.Popen(command, stdout = sp.PIPE, bufsize=10**8)
+pipe = sp.Popen(command, stdout=sp.PIPE, bufsize=10**8)
 
 # get the average rgb value of a frame
 def draw_next_frame_rgb_avg(raw_frame):    
